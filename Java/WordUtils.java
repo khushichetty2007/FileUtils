@@ -1,4 +1,3 @@
-
 /**
  *	Provides utilities for word games:
  *	1. finds all words in the dictionary that match a list of letters
@@ -20,18 +19,24 @@ public class WordUtils
 	private final String WORD_FILE = "wordList.txt";
 	
 	/* Constructor */
-	public WordUtils() { }
+	public WordUtils() 
+	{ 
+		words = new String [90934];
+		loadWords();
+	}
 	
 	/**	Load all of the dictionary from a file into words array. */
 	private void loadWords () {
-		Scanner input = FileUtils.openToRead(WORD_FILE);
+		Scanner input = null;
+		input = FileUtils.openToRead(WORD_FILE);
 		int count = 0;
-		while (input.hasNext())
+		while(input.hasNext())
 		{
 			words[count] = input.next();
-			input.nextLine();
 			count++;
-		}
+		}	
+		
+		input.close();
 	}
 	
 	/**	Find all words that can be formed by a list of letters.
@@ -40,36 +45,83 @@ public class WordUtils
 	 */
 	public String [] findAllWords (String letters)
 	{
-		boolean ifTrue =true;
-		String ar = new String [];
-		for (int a = 0; a<words.length(); a++){
-			String str = words[a];
-			char c = str.charAt(a);
-			if (letters.indexOf(c) >-1){
-				String[a]= letters.substring(0,letters.indexOf(c))
-					+ letters.substring(letters.indexOf(c)+1);
-					ifTrue = true;
-				}
-			else {
-				ifTrue = false;
-				a = words.length();
-			}
-		}
-			if(ifTrue = true)
-			{
-				int numChars = word.length();
-				words[numChars][numWords[numChars]]= word ;
-				numWords[numChars]++;
+		int count = 0;
+		boolean check = true;
+		boolean bool = true;
+		String [] matched = new String [words.length];
+		char c = '?';
+		
+		String newLetters = new String("");
+		for(int i = 0; i < words.length; i++)
+		{
+		    if (words[i].length() <= letters.length()) 
+		    {
+		    	newLetters = letters;
+		    	for(int j = 0; j < words[i].length(); j++)
+				{
+					bool = true;
+					c = words[i].charAt(j);
+					if(newLetters.length() >= 1)
+					{
+						if(newLetters.indexOf(c) == -1)
+						{
+							check = false;
+							j = words[i].length();
+						}
+						else if(newLetters.length() >= 1)
+						{
+							String string1 = new String("");
+							String string2 = new String("");
+							int num = 0;
+							num = newLetters.indexOf(c);
+							string1 = newLetters.substring(0,num);
+							string2 = newLetters.substring(num+1,newLetters.length());
+							newLetters = string1+string2;
+						
+							if((words[i].length() == j+1) && (words[i].length() < letters.length()))
+							{
+							matched[count] = words[i];
+							count++;
+							bool = false;
+							}
+						} // else if
+				    } //if
+					else
+						j = words[i].length();
+			    } // for
 				
-			}
-		}		
-		return new String[10];
+				if(check && bool)
+				{
+					matched[count] = words[i];
+					count++;
+				}
+				check = true;
+			
+		    } // if
+		}// for
+
+		return matched;	
 	}
 	
 	/**	Print the words found to the screen.
-	 *  @param words	array containing the words to be printed
+	 *  @param wordsList	array containing the words to be printed
 	 */
-	public void printWords (String [] wordList) { }
+	public void printWords (String [] wordList)
+	{ 
+		System.out.println();
+		for (int i = 0; i < wordList.length; i++) 
+		{
+			if(wordList[i] != null)
+			{
+				if((i + 1) % 5 != 0)
+					System.out.printf("%-15s\t", wordList[i]);
+					else
+						System.out.printf("%-15s\n", wordList[i]);
+			}
+		}
+		System.out.println();
+
+	}
 	
 	/**	Finds the highest scoring word according to a score table.
 	 *
@@ -79,7 +131,34 @@ public class WordUtils
 	 */
 	public String bestWord (String [] wordList, int [] scoreTable)
 	{
-		return "";
+		String best = "";
+		int num = 0;
+		int length = 0;
+		int [] listScores = new int [wordList.length];
+		for (int i=0 ;i<wordList.length; i++)
+		{
+			if(wordList[i] != null) 
+				length++;
+		}
+		for(int a = 0; a < length; a++)
+		{
+			listScores[a] = getScore(wordList[a], scoreTable);
+		}
+		
+		int count = 0;
+		for(int j = 1; j < listScores.length; j++)
+		{
+				num = listScores[j];
+				if(listScores[j] > num)
+				{
+					num = listScores[j];
+					count = j;
+				}
+		}
+		
+		best = wordList[count];
+
+		return best;
 	}
 	
 	/**	Calculates the score of one word according to a score table.
@@ -90,7 +169,15 @@ public class WordUtils
 	 */
 	public int getScore (String word, int [] scoreTable)
 	{
-		return 0;
+		int finalScore = 0;
+		word = word.toLowerCase();
+		for (int i = 0; i<word.length(); i++)
+		{
+			int num = 0;
+			num = word.charAt(i) - 'a';
+			finalScore += scoreTable[num];
+		}
+		return finalScore;
 	}
 	
 	/***************************************************************/
@@ -104,6 +191,7 @@ public class WordUtils
 	
 	public void run() {
 		String letters = Prompt.getString("Please enter a list of letters, from 3 to 12 letters long, without spaces");
+		loadWords();
 		String [] word = findAllWords(letters);
 		System.out.println();
 		printWords(word);
