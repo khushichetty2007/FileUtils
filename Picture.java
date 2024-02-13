@@ -269,5 +269,42 @@ public class Picture extends SimplePicture
       }
     }
   }
+	/** To pixelate by dividing area into size x size.
+	* @param size Side length of square area to pixelate.
+	*/
+	public void pixelate(int size) 
+	{
+		int red = 0;
+		int green = 0;
+		int blue = 0;
+		
+		Pixel [][] pixels = this.getPixxels2D();
+		for(int row = 0; row<pixels.length; row+= size)
+		{
+			for (int col = 0; col<pixels[0].length; col+=size)
+			{
+				if(col+size < pixels[0].length && row + size <pixels.length)
+				{
+					for (int i = row; i<row+size; i++)
+					{
+						for (int x= col; x<col+size; x++)
+						{
+							red = red +pixels[row][col].getRed();
+							green = green +pixels[row][col].getGreen();
+							blue = blue +pixels[row][col].getBlue();
+						}
+					}
+					red = red/ (size*size);
+					green = green / (size*size);
+					blue = blue / (size*size);
+					Color myColor = new Color(red, green,blue);
+					for (int x= row; x<row+size; x++)
+					{
+						for(int y = col; y< col +size; y++)
+						for(int y = col; y< col +size; y++)
+						}
+		}
+	  
+	}
   
 } // this } is the end of class Picture, put all new methods before this
